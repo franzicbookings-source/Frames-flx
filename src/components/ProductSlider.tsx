@@ -1,6 +1,6 @@
-import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
-import { useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { useRef } from 'react';
+import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { Product, Category } from '../types';
 
@@ -37,7 +37,6 @@ const products: Record<Category, Product[]> = {
 export default function ProductSlider({ title, category }: { title: string, category: Category }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -48,7 +47,7 @@ export default function ProductSlider({ title, category }: { title: string, cate
   };
 
   const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
+    navigate(`/product/${product.id}`, { state: { product } });
   };
 
   const items = products[category];
@@ -91,13 +90,6 @@ export default function ProductSlider({ title, category }: { title: string, cate
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
               
-              {/* Mobile Indicator */}
-              <div className="absolute top-2 right-2 lg:hidden">
-                <div className="w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm">
-                  <Plus className="w-3 h-3 text-black" />
-                </div>
-              </div>
-
               {/* Desktop Quick View */}
               <div className="absolute bottom-0 left-0 w-full p-4 translate-y-full lg:group-hover:translate-y-0 transition-transform duration-500 ease-out hidden lg:flex justify-center">
                 <span className="bg-white text-black text-[9px] font-semibold tracking-[0.2em] uppercase px-6 py-2 md:px-8 md:py-3 shadow-lg hover:bg-black hover:text-white transition-colors">
@@ -115,56 +107,6 @@ export default function ProductSlider({ title, category }: { title: string, cate
           </motion.div>
         ))}
       </div>
-
-      {/* Quick View Modal */}
-      <AnimatePresence>
-        {selectedProduct && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedProduct(null)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setSelectedProduct(null)}
-                className="absolute top-4 right-4 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors shadow-sm"
-              >
-                <X className="w-5 h-5 text-black" />
-              </button>
-              <div className="w-full md:w-1/2 bg-[#f5f5f4] aspect-square md:aspect-auto relative">
-                <img src={selectedProduct.image} alt={selectedProduct.name} className="absolute inset-0 w-full h-full object-cover" />
-              </div>
-              <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-                <p className="text-[10px] font-semibold tracking-[0.3em] text-gray-400 uppercase mb-3">{selectedProduct.brand}</p>
-                <h3 className="text-2xl md:text-3xl font-serif tracking-widest uppercase mb-4 text-black leading-tight">{selectedProduct.name}</h3>
-                <p className="text-xl font-serif tracking-wider text-black mb-6">{selectedProduct.price}</p>
-                <div className="w-12 h-[1px] bg-gray-200 mb-6"></div>
-                <p className="text-sm text-gray-500 leading-relaxed mb-8 font-light">
-                  Experience the perfect blend of luxury and everyday wear. These frames are meticulously crafted to provide unparalleled comfort and a bold, distinctive look for any occasion.
-                </p>
-                <button 
-                  onClick={() => {
-                    setSelectedProduct(null);
-                    navigate('/checkout', { state: { product: selectedProduct } });
-                  }}
-                  className="w-full bg-black text-white py-4 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-colors"
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }

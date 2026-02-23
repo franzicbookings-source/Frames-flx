@@ -1,25 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Minus, Plus, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Product } from '../types';
 
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [cartItems, setCartItems] = useState<{ product: Product, quantity: number }[]>([]);
 
   useEffect(() => {
     if (location.state?.product) {
-      setProduct(location.state.product);
+      // Initialize cart with the product passed from the product page
+      setCartItems([{ product: location.state.product, quantity: 1 }]);
     } else {
-      // Fallback if no state (e.g., direct URL access)
-      navigate('/');
+      // If no product in state, we just show an empty cart
+      setCartItems([]);
     }
     window.scrollTo(0, 0);
-  }, [location, navigate]);
+  }, [location]);
 
-  if (!product) return null;
+  const updateQuantity = (index: number, delta: number) => {
+    const newItems = [...cartItems];
+    const newQuantity = newItems[index].quantity + delta;
+    if (newQuantity > 0) {
+      newItems[index].quantity = newQuantity;
+      setCartItems(newItems);
+    }
+  };
+
+  const removeItem = (index: number) => {
+    const newItems = [...cartItems];
+    newItems.splice(index, 1);
+    setCartItems(newItems);
+  };
+
+  // Calculate totals (assuming price is formatted like "R3500")
+  const subtotal = cartItems.reduce((total, item) => {
+    const priceNum = parseInt(item.product.price.replace(/\D/g, ''), 10) || 0;
+    return total + (priceNum * item.quantity);
+  }, 0);
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-20 px-4 md:px-8">
@@ -29,75 +49,114 @@ export default function Checkout() {
           className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] uppercase mb-12 hover:text-gray-500 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Shop
+          Continue Shopping
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
-          {/* Product Image Section */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/5] max-h-[80vh] bg-[#f5f5f4] overflow-hidden shadow-sm flex items-center justify-center p-8 md:p-12"
-          >
-            <img 
-              src={product.image} 
-              alt={product.name} 
-              className="max-w-full max-h-full object-contain transition-transform duration-700 hover:scale-105"
-            />
-          </motion.div>
+        <h1 className="text-3xl md:text-4xl font-serif tracking-widest uppercase text-black mb-12">
+          Shopping Bag
+        </h1>
 
-          {/* Checkout Details Section */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex flex-col"
-          >
-            <div className="border-b border-gray-100 pb-8 mb-8">
-              <p className="text-[10px] md:text-xs font-semibold tracking-[0.3em] text-gray-400 mb-4 uppercase">
-                {product.brand}
-              </p>
-              <h1 className="text-3xl md:text-5xl font-serif tracking-tight text-black mb-4">
-                {product.name}
-              </h1>
-              <p className="text-xl md:text-2xl font-serif text-black">
-                {product.price}
-              </p>
+        {cartItems.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-lg text-gray-500 mb-8 font-light">Your shopping bag is currently empty.</p>
+            <button 
+              onClick={() => navigate('/')}
+              className="bg-black text-white px-8 py-4 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-colors"
+            >
+              Discover Collections
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
+            {/* Cart Items List */}
+            <div className="w-full lg:w-2/3 flex flex-col gap-8">
+              {cartItems.map((item, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col sm:flex-row gap-6 border-b border-gray-200 pb-8 relative"
+                >
+                  <button 
+                    onClick={() => removeItem(index)}
+                    className="absolute top-0 right-0 p-2 text-gray-400 hover:text-black transition-colors"
+                    aria-label="Remove item"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  
+                  <div className="w-full sm:w-40 aspect-square bg-[#f5f5f4] flex-shrink-0">
+                    <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
+                  </div>
+                  
+                  <div className="flex flex-col flex-grow justify-between py-2">
+                    <div>
+                      <p className="text-[10px] font-semibold tracking-[0.3em] text-gray-400 uppercase mb-2">{item.product.brand}</p>
+                      <h3 className="text-lg md:text-xl font-serif tracking-widest uppercase text-black pr-8 mb-2">{item.product.name}</h3>
+                      <p className="text-xs text-gray-500 mb-4">Variation: Black</p>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-4 sm:mt-0">
+                      <div className="flex items-center border border-gray-200">
+                        <button 
+                          onClick={() => updateQuantity(index, -1)}
+                          className="p-3 hover:bg-gray-50 transition-colors"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
+                        <button 
+                          onClick={() => updateQuantity(index, 1)}
+                          className="p-3 hover:bg-gray-50 transition-colors"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <p className="text-lg font-serif tracking-wider text-black">
+                        R{(parseInt(item.product.price.replace(/\D/g, ''), 10) * item.quantity).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
-            <div className="space-y-8 mb-12">
-              <div>
-                <h3 className="text-[11px] font-bold tracking-[0.2em] uppercase text-black mb-4">Description</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  Masterfully curated, these {product.brand} frames feature premium acetate and polarized lenses for ultimate clarity and style. A testament to Durban's bold aesthetic vision.
+            {/* Order Summary */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="w-full lg:w-1/3"
+            >
+              <div className="bg-[#f5f5f4] p-8">
+                <h2 className="text-sm font-bold tracking-[0.2em] uppercase mb-6">Order Summary</h2>
+                
+                <div className="space-y-4 mb-8 text-sm font-light">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="text-black">R{subtotal.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Estimated Shipping</span>
+                    <span className="text-black">Calculated at checkout</span>
+                  </div>
+                </div>
+                
+                <div className="border-t border-gray-300 pt-6 mb-8 flex justify-between items-end">
+                  <span className="text-sm font-bold tracking-[0.2em] uppercase">Total</span>
+                  <span className="text-2xl font-serif tracking-wider text-black">R{subtotal.toLocaleString()}</span>
+                </div>
+                
+                <button className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-all flex justify-center items-center gap-2">
+                  Checkout
+                </button>
+                
+                <p className="text-[9px] text-center text-gray-400 tracking-widest uppercase mt-6">
+                  Secure checkout powered by Flex Frames
                 </p>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-gray-100">
-                <div className="flex flex-col items-center text-center">
-                  <Truck className="w-5 h-5 mb-3 text-gray-400" />
-                  <p className="text-[9px] font-bold tracking-[0.1em] uppercase">Free Shipping</p>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <RotateCcw className="w-5 h-5 mb-3 text-gray-400" />
-                  <p className="text-[9px] font-bold tracking-[0.1em] uppercase">30-Day Returns</p>
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <ShieldCheck className="w-5 h-5 mb-3 text-gray-400" />
-                  <p className="text-[9px] font-bold tracking-[0.1em] uppercase">2-Year Warranty</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <button className="w-full bg-black text-white py-5 text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-gray-800 transition-all">
-                Proceed to Payment
-              </button>
-              <p className="text-[10px] text-center text-gray-400 tracking-widest uppercase">
-                Secure checkout powered by Flex Frames
-              </p>
-            </div>
-          </motion.div>
-        </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </div>
   );

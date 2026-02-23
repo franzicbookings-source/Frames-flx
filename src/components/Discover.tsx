@@ -1,6 +1,13 @@
 import { motion } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Discover() {
+  const navigate = useNavigate();
+
+  const handleProductClick = (id: number, name: string, brand: string, price: string, image: string) => {
+    navigate(`/product/${id}`, { state: { product: { id, name, brand, price, image } } });
+  };
+
   return (
     <section className="py-20 md:py-32 bg-white">
       <div className="max-w-[1600px] mx-auto px-4 md:px-8">
@@ -29,6 +36,7 @@ export default function Discover() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="md:col-span-7 group cursor-pointer"
+            onClick={() => handleProductClick(1, 'LV Matte Sport Polarized', 'Louis Vuitton', 'R3500', 'https://i.ibb.co/fVxhSH4C/IMG-20260219-WA0047.jpg')}
           >
             <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden bg-[#f5f5f4] mb-6 shadow-sm rounded-sm">
               <img 
@@ -51,6 +59,7 @@ export default function Discover() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="group cursor-pointer"
+              onClick={() => handleProductClick(7, 'Gucci Oversized GG', 'Gucci', 'R3500', 'https://i.ibb.co/WW5HZRs4/IMG-20260219-WA0048.jpg')}
             >
               <div className="relative aspect-square md:aspect-[4/5] overflow-hidden bg-[#f5f5f4] mb-6 shadow-sm rounded-sm">
                 <img 
@@ -71,6 +80,7 @@ export default function Discover() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.6 }}
               className="group cursor-pointer"
+              onClick={() => handleProductClick(15, 'Gucci Slim Rectangle', 'Gucci', 'R3500', 'https://i.ibb.co/TDwdvGmW/IMG-20260219-WA0057.jpg')}
             >
               <div className="relative aspect-[16/9] md:aspect-[4/3] overflow-hidden bg-[#f5f5f4] mb-6 shadow-sm rounded-sm">
                 <img 

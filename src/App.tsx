@@ -8,6 +8,7 @@ import BrandEthos from './components/BrandEthos';
 import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
 import Checkout from './components/Checkout';
+import ProductPage from './components/ProductPage';
 
 function Home() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/checkout" element={<Checkout />} />
         </Routes>
         <Footer />

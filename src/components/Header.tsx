@@ -49,21 +49,26 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      {/* Newsletter Top Bar */}
+      <div className="bg-[#141414] text-white py-2 px-4 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-6 relative">
+        <p className="text-[9px] sm:text-[10px] font-semibold tracking-[0.2em] uppercase">Join the Flex Frames Club</p>
+        <form className="flex items-center" onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing!'); }}>
+          <input 
+            type="email" 
+            placeholder="Enter your email" 
+            className="bg-transparent border-b border-white/30 text-white placeholder:text-white/50 px-2 py-1 text-[10px] focus:outline-none focus:border-white w-40 sm:w-48 transition-colors" 
+            required 
+          />
+          <button type="submit" className="ml-3 text-[9px] font-bold tracking-[0.2em] uppercase hover:text-gray-400 transition-colors">
+            Subscribe
+          </button>
+        </form>
+      </div>
+
       <div className="flex items-center justify-between px-4 py-4 md:px-8">
-        <div className="flex items-center lg:hidden">
-          <button 
-            className="p-2 -ml-2 hover:bg-gray-50 rounded-full transition-colors"
-            onClick={() => setIsMenuOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <button className="p-2 ml-1 hover:bg-gray-50 rounded-full transition-colors" aria-label="Search">
-            <Search className="w-5 h-5" />
-          </button>
-        </div>
         
-        <nav className="hidden lg:flex items-center space-x-8">
+        {/* Desktop Left Nav */}
+        <nav className="hidden lg:flex items-center space-x-8 w-1/3">
           {navLinks.map((link) => (
             <a 
               key={link.name}
@@ -75,21 +80,30 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2 w-max">
+        {/* Logo (Left on mobile, Center on desktop) */}
+        <div className="flex-shrink-0 lg:w-1/3 lg:flex lg:justify-center">
           <Link to="/" className="text-xl sm:text-2xl md:text-3xl font-serif tracking-widest uppercase font-bold hover:opacity-70 transition-opacity">
             Flex Frames
           </Link>
         </div>
 
-        <div className="flex items-center space-x-1 md:space-x-4">
-          <button className="hidden lg:block p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Search">
-            <Search className="w-5 h-5" />
-          </button>
+        {/* Right Icons (Desktop & Mobile) */}
+        <div className="flex items-center space-x-1 sm:space-x-2 lg:w-1/3 lg:justify-end">
           <button className="hidden lg:block p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Account">
             <User className="w-5 h-5" />
           </button>
-          <button className="p-2 -mr-2 md:mr-0 hover:bg-gray-50 rounded-full transition-colors" aria-label="Cart">
+          <button className="hidden lg:block p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Search">
+            <Search className="w-5 h-5" />
+          </button>
+          <Link to="/checkout" className="p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Cart">
             <ShoppingBag className="w-5 h-5" />
+          </Link>
+          <button 
+            className="p-2 hover:bg-gray-50 rounded-full transition-colors lg:hidden"
+            onClick={() => setIsMenuOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -116,31 +130,31 @@ export default function Header() {
             </div>
             
             <div className="flex-1 overflow-y-auto py-8">
-              <p className="text-[10px] font-semibold tracking-[0.2em] text-gray-400 uppercase mb-6 px-6">Explore Collections</p>
+              <p className="text-xs font-bold tracking-[0.25em] text-black uppercase mb-8 px-6 border-l-2 border-black ml-6 pl-4">Explore Collections</p>
               
               <motion.div 
                 variants={containerVariants}
                 initial="hidden"
                 animate="show"
-                className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 pb-8 space-x-4"
+                className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 pb-12 space-x-6"
               >
                 {navLinks.map((link) => (
                   <motion.a
                     variants={itemVariants}
                     key={link.name}
                     href={link.href} 
-                    className="flex-shrink-0 w-[75%] sm:w-[60%] aspect-[4/5] relative rounded-sm overflow-hidden snap-center group shadow-sm"
+                    className="flex-shrink-0 w-[80%] sm:w-[60%] aspect-[4/5] relative rounded-lg overflow-hidden snap-center group shadow-md"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <img src={link.image} alt={link.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-500" />
-                    <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent group-hover:from-black/90 transition-colors duration-500" />
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end">
                       <div className="flex items-center justify-between">
-                        <span className="text-2xl font-serif tracking-widest uppercase text-white drop-shadow-md">
+                        <span className="text-3xl font-serif tracking-widest uppercase text-white drop-shadow-lg">
                           {link.name}
                         </span>
-                        <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
-                          <ArrowRight className="w-4 h-4" />
+                        <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/40 group-hover:bg-white group-hover:text-black transition-all duration-300">
+                          <ArrowRight className="w-5 h-5" />
                         </div>
                       </div>
                     </div>
@@ -153,20 +167,32 @@ export default function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="px-6 mt-2 flex flex-col space-y-6"
+                className="px-6 mt-4 flex flex-col space-y-2"
               >
-                 <a href="#" className="text-xs font-semibold tracking-[0.15em] uppercase border-b border-gray-100 pb-4 flex justify-between items-center hover:text-gray-500 transition-colors">
-                   Stores
-                   <ArrowRight className="w-4 h-4 text-gray-300" />
-                 </a>
-                 <a href="#" className="text-xs font-semibold tracking-[0.15em] uppercase border-b border-gray-100 pb-4 flex justify-between items-center hover:text-gray-500 transition-colors">
+                 <button 
+                   onClick={() => {
+                     setIsMenuOpen(false);
+                     alert('Account feature coming soon!');
+                   }}
+                   className="w-full text-left text-sm font-bold tracking-[0.2em] uppercase border-b border-gray-200 py-6 flex justify-between items-center hover:text-gray-500 transition-colors group"
+                 >
                    Account
-                   <User className="w-4 h-4 text-gray-300" />
-                 </a>
-                 <a href="#" className="text-xs font-semibold tracking-[0.15em] uppercase border-b border-gray-100 pb-4 flex justify-between items-center hover:text-gray-500 transition-colors">
+                   <div className="p-2 bg-gray-50 rounded-full group-hover:bg-gray-100 transition-colors">
+                     <User className="w-5 h-5 text-black" />
+                   </div>
+                 </button>
+                 <button 
+                   onClick={() => {
+                     setIsMenuOpen(false);
+                     alert('Search feature coming soon!');
+                   }}
+                   className="w-full text-left text-sm font-bold tracking-[0.2em] uppercase border-b border-gray-200 py-6 flex justify-between items-center hover:text-gray-500 transition-colors group"
+                 >
                    Search
-                   <Search className="w-4 h-4 text-gray-300" />
-                 </a>
+                   <div className="p-2 bg-gray-50 rounded-full group-hover:bg-gray-100 transition-colors">
+                     <Search className="w-5 h-5 text-black" />
+                   </div>
+                 </button>
               </motion.div>
             </div>
           </motion.div>

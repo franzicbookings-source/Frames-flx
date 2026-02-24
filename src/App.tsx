@@ -7,8 +7,11 @@ import Discover from './components/Discover';
 import BrandEthos from './components/BrandEthos';
 import Newsletter from './components/Newsletter';
 import Footer from './components/Footer';
-import Checkout from './components/Checkout';
+import Cart from './components/Cart';
 import ProductPage from './components/ProductPage';
+import Wishlist from './components/Wishlist';
+import { WishlistProvider } from './context/WishlistContext';
+import { CartProvider } from './context/CartContext';
 
 function Home() {
   return (
@@ -27,16 +30,21 @@ function Home() {
 
 export default function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-white text-black font-sans">
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/checkout" element={<Checkout />} />
-        </Routes>
-        <Footer />
-      </div>
-    </Router>
+    <CartProvider>
+      <WishlistProvider>
+        <Router>
+          <div className="min-h-screen bg-white text-black font-sans">
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/product/:id" element={<ProductPage />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+            </Routes>
+            <Footer />
+          </div>
+        </Router>
+      </WishlistProvider>
+    </CartProvider>
   );
 }

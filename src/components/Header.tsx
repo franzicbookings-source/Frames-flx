@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Search, User, ShoppingBag, Menu, X, ArrowRight } from 'lucide-react';
+import { Search, User, ShoppingBag, Menu, X, ArrowRight, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { wishlist } = useWishlist();
+  const { cartCount } = useCart();
 
   const navLinks = [
     { name: 'Sun', href: '#', image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=800&auto=format&fit=crop' },
@@ -67,44 +71,50 @@ export default function Header() {
 
       <div className="flex items-center justify-between px-4 py-4 md:px-8">
         
-        {/* Desktop Left Nav */}
-        <nav className="hidden lg:flex items-center space-x-8 w-1/3">
-          {navLinks.map((link) => (
-            <a 
-              key={link.name}
-              href={link.href} 
-              className="text-[11px] font-semibold tracking-[0.2em] uppercase hover:text-gray-400 transition-colors"
-            >
-              {link.name}
-            </a>
-          ))}
-        </nav>
-
-        {/* Logo (Left on mobile, Center on desktop) */}
-        <div className="flex-shrink-0 lg:w-1/3 lg:flex lg:justify-center">
-          <Link to="/" className="text-xl sm:text-2xl md:text-3xl font-serif tracking-widest uppercase font-bold hover:opacity-70 transition-opacity">
-            Flex Frames
-          </Link>
-        </div>
-
-        {/* Right Icons (Desktop & Mobile) */}
-        <div className="flex items-center space-x-1 sm:space-x-2 lg:w-1/3 lg:justify-end">
-          <button className="hidden lg:block p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Account">
-            <User className="w-5 h-5" />
-          </button>
-          <button className="hidden lg:block p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Search">
-            <Search className="w-5 h-5" />
-          </button>
-          <Link to="/checkout" className="p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Cart">
-            <ShoppingBag className="w-5 h-5" />
-          </Link>
+        {/* Left Icons (Hamburger & Search) */}
+        <div className="flex items-center space-x-1 sm:space-x-2 w-1/3 justify-start">
           <button 
-            className="p-2 hover:bg-gray-50 rounded-full transition-colors lg:hidden"
+            className="p-2 hover:bg-gray-50 rounded-full transition-colors"
             onClick={() => setIsMenuOpen(true)}
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
           </button>
+          <button className="hidden sm:block p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Search">
+            <Search className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Logo (Center) */}
+        <div className="flex-shrink-0 w-1/3 flex justify-center">
+          <Link to="/" className="text-xl sm:text-2xl md:text-3xl font-serif tracking-widest uppercase font-bold hover:opacity-70 transition-opacity whitespace-nowrap">
+            Flex Frames
+          </Link>
+        </div>
+
+        {/* Right Icons (Wishlist & Cart) */}
+        <div className="flex items-center space-x-1 sm:space-x-2 w-1/3 justify-end">
+          <button 
+            className="hidden sm:block p-2 hover:bg-gray-50 rounded-full transition-colors" 
+            aria-label="Account"
+            onClick={() => alert('Account feature coming soon!')}
+          >
+            <User className="w-5 h-5" />
+          </button>
+          <Link to="/wishlist" className="p-2 hover:bg-gray-50 rounded-full transition-colors relative" aria-label="Wishlist">
+            <Heart className="w-5 h-5" />
+            {wishlist.length > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-black rounded-full"></span>
+            )}
+          </Link>
+          <Link to="/cart" className="p-2 hover:bg-gray-50 rounded-full transition-colors relative" aria-label="Cart">
+            <ShoppingBag className="w-5 h-5" />
+            {cartCount > 0 && (
+              <span className="absolute top-1 right-1 w-3 h-3 bg-black text-white text-[8px] font-bold flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 

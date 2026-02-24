@@ -1,42 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Minus, Plus, X } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Product } from '../types';
+import { useCart } from '../context/CartContext';
 
-export default function Checkout() {
-  const location = useLocation();
+export default function Cart() {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState<{ product: Product, quantity: number }[]>([]);
+  const { cart, removeFromCart, updateQuantity } = useCart();
 
   useEffect(() => {
-    if (location.state?.product) {
-      // Initialize cart with the product passed from the product page
-      setCartItems([{ product: location.state.product, quantity: 1 }]);
-    } else {
-      // If no product in state, we just show an empty cart
-      setCartItems([]);
-    }
     window.scrollTo(0, 0);
-  }, [location]);
-
-  const updateQuantity = (index: number, delta: number) => {
-    const newItems = [...cartItems];
-    const newQuantity = newItems[index].quantity + delta;
-    if (newQuantity > 0) {
-      newItems[index].quantity = newQuantity;
-      setCartItems(newItems);
-    }
-  };
-
-  const removeItem = (index: number) => {
-    const newItems = [...cartItems];
-    newItems.splice(index, 1);
-    setCartItems(newItems);
-  };
+  }, []);
 
   // Calculate totals (assuming price is formatted like "R3500")
-  const subtotal = cartItems.reduce((total, item) => {
+  const subtotal = cart.reduce((total, item) => {
     const priceNum = parseInt(item.product.price.replace(/\D/g, ''), 10) || 0;
     return total + (priceNum * item.quantity);
   }, 0);
@@ -53,12 +30,12 @@ export default function Checkout() {
         </button>
 
         <h1 className="text-3xl md:text-4xl font-serif tracking-widest uppercase text-black mb-12">
-          Shopping Bag
+          Shopping Cart
         </h1>
 
-        {cartItems.length === 0 ? (
+        {cart.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-lg text-gray-500 mb-8 font-light">Your shopping bag is currently empty.</p>
+            <p className="text-lg text-gray-500 mb-8 font-light">Your shopping cart is currently empty.</p>
             <button 
               onClick={() => navigate('/')}
               className="bg-black text-white px-8 py-4 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-colors"
@@ -70,43 +47,43 @@ export default function Checkout() {
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
             {/* Cart Items List */}
             <div className="w-full lg:w-2/3 flex flex-col gap-8">
-              {cartItems.map((item, index) => (
+              {cart.map((item, index) => (
                 <motion.div 
-                  key={index}
+                  key={item.product.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col sm:flex-row gap-6 border-b border-gray-200 pb-8 relative"
                 >
                   <button 
-                    onClick={() => removeItem(index)}
+                    onClick={() => removeFromCart(item.product.id)}
                     className="absolute top-0 right-0 p-2 text-gray-400 hover:text-black transition-colors"
                     aria-label="Remove item"
                   >
                     <X className="w-5 h-5" />
                   </button>
                   
-                  <div className="w-full sm:w-40 aspect-square bg-[#f5f5f4] flex-shrink-0">
+                  <div className="w-full sm:w-40 aspect-square bg-[#f5f5f4] flex-shrink-0 cursor-pointer" onClick={() => navigate(`/product/${item.product.id}`, { state: { product: item.product } })}>
                     <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover" />
                   </div>
                   
                   <div className="flex flex-col flex-grow justify-between py-2">
                     <div>
                       <p className="text-[10px] font-semibold tracking-[0.3em] text-gray-400 uppercase mb-2">{item.product.brand}</p>
-                      <h3 className="text-lg md:text-xl font-serif tracking-widest uppercase text-black pr-8 mb-2">{item.product.name}</h3>
+                      <h3 className="text-lg md:text-xl font-serif tracking-widest uppercase text-black pr-8 mb-2 cursor-pointer hover:underline" onClick={() => navigate(`/product/${item.product.id}`, { state: { product: item.product } })}>{item.product.name}</h3>
                       <p className="text-xs text-gray-500 mb-4">Variation: Black</p>
                     </div>
                     
                     <div className="flex items-center justify-between mt-4 sm:mt-0">
                       <div className="flex items-center border border-gray-200">
                         <button 
-                          onClick={() => updateQuantity(index, -1)}
+                          onClick={() => updateQuantity(item.product.id, -1)}
                           className="p-3 hover:bg-gray-50 transition-colors"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
                         <span className="w-10 text-center text-sm font-medium">{item.quantity}</span>
                         <button 
-                          onClick={() => updateQuantity(index, 1)}
+                          onClick={() => updateQuantity(item.product.id, 1)}
                           className="p-3 hover:bg-gray-50 transition-colors"
                         >
                           <Plus className="w-3 h-3" />

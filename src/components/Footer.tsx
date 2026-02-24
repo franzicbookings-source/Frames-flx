@@ -32,10 +32,11 @@ export default function Footer() {
             <div className="flex flex-col">
               <h3 className="text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400 mb-8">Support</h3>
               <ul className="space-y-5 text-[13px] text-black font-medium tracking-widest">
-                <li><a href="#" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Contact Us</a></li>
-                <li><a href="#" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Shipping & Returns</a></li>
-                <li><a href="#" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>FAQ</a></li>
-                <li><a href="#" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Care Guide</a></li>
+                <li><a href="mailto:hello@flexframes.co.za" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>hello@flexframes.co.za</a></li>
+                <li><a href="https://wa.me/27739844001" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>073 984 4001</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); alert('Shipping & Returns policy coming soon!'); }} className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Shipping & Returns</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); alert('FAQ coming soon!'); }} className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>FAQ</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); alert('Care Guide coming soon!'); }} className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Care Guide</a></li>
               </ul>
             </div>
             <div className="flex flex-col">

@@ -1,17 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Truck, Phone, ShoppingBag } from 'lucide-react';
+import { ChevronDown, ChevronUp, Truck, Phone, ShoppingBag, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
 
 export default function ProductPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const product = location.state?.product as Product;
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
 
   const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [wishlistFeedback, setWishlistFeedback] = useState<{ show: boolean, message: string }>({ show: false, message: '' });
+
+  const isProductInWishlist = product ? isInWishlist(product.id) : false;
+
+  const handleWishlistToggle = () => {
+    if (isProductInWishlist) {
+      removeFromWishlist(product.id);
+      setWishlistFeedback({ show: true, message: 'Removed from Wishlist' });
+    } else {
+      addToWishlist(product);
+      setWishlistFeedback({ show: true, message: 'Added to Wishlist' });
+    }
+    setTimeout(() => setWishlistFeedback({ show: false, message: '' }), 3000);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -48,8 +68,29 @@ export default function ProductPage() {
     setSelectedImage(0); // Reset to main image of that color
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setMousePos({ x, y });
+  };
+
   return (
-    <div className="bg-white min-h-screen pt-10 pb-24">
+    <div className="bg-white min-h-screen pt-10 pb-24 relative">
+      <AnimatePresence>
+        {wishlistFeedback.show && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-black text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2"
+          >
+            <Heart className={`w-4 h-4 ${isProductInWishlist ? 'fill-white' : ''}`} />
+            <span className="text-xs font-semibold tracking-widest uppercase">{wishlistFeedback.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24">
           
@@ -69,11 +110,19 @@ export default function ProductPage() {
             </div>
             
             {/* Main Image */}
-            <div className="w-full bg-[#f5f5f4] aspect-square md:aspect-[4/5] relative overflow-hidden">
+            <div 
+              className="w-full bg-[#f5f5f4] aspect-square md:aspect-[4/5] relative overflow-hidden cursor-zoom-in"
+              onMouseEnter={() => setIsZoomed(true)}
+              onMouseLeave={() => setIsZoomed(false)}
+              onMouseMove={handleMouseMove}
+            >
               <img 
                 src={images[selectedImage]} 
                 alt={product.name} 
-                className="absolute inset-0 w-full h-full object-cover object-center"
+                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-200 ease-out ${isZoomed ? 'scale-[2]' : 'scale-100'}`}
+                style={{
+                  transformOrigin: isZoomed ? `${mousePos.x}% ${mousePos.y}%` : 'center center'
+                }}
               />
             </div>
           </div>
@@ -101,14 +150,26 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Add to Bag */}
-            <button 
-              onClick={() => navigate('/checkout', { state: { product } })}
-              className="w-full bg-black text-white py-5 flex items-center justify-center gap-3 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-colors mb-8"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Add to Bag
-            </button>
+            {/* Add to Cart & Wishlist */}
+            <div className="flex flex-col gap-3 mb-8">
+              <button 
+                onClick={() => {
+                  addToCart(product);
+                  navigate('/cart');
+                }}
+                className="w-full bg-black text-white py-5 flex items-center justify-center gap-3 text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-colors"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Add to Cart
+              </button>
+              <button 
+                onClick={handleWishlistToggle}
+                className={`w-full py-5 flex items-center justify-center gap-3 text-[11px] font-bold tracking-[0.2em] uppercase border transition-all duration-300 ${isProductInWishlist ? 'bg-gray-100 border-gray-200 text-black' : 'bg-white border-black text-black hover:bg-gray-50'}`}
+              >
+                <Heart className={`w-4 h-4 ${isProductInWishlist ? 'fill-black' : ''}`} />
+                {isProductInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              </button>
+            </div>
 
             {/* Delivery Info */}
             <div className="space-y-4 mb-12 text-sm text-gray-600 font-light">
@@ -121,19 +182,38 @@ export default function ProductPage() {
               </div>
               <div className="flex items-center gap-3 pt-2">
                 <Phone className="w-4 h-4 flex-shrink-0" />
-                <a href="tel:+27123456789" className="underline underline-offset-4 hover:text-black transition-colors">Order by Phone</a>
+                <a href="https://wa.me/27739844001" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-black transition-colors">Order by WhatsApp</a>
               </div>
             </div>
 
             {/* Accordions */}
             <div className="border-t border-gray-200">
               {/* Product Description */}
-              <div className="py-6 border-b border-gray-200">
-                <h3 className="text-xs font-bold tracking-[0.2em] uppercase mb-4">Product Description</h3>
-                <p className="text-xs text-gray-400 mb-4">Style 859558 J0740 1012</p>
-                <p className="text-sm text-gray-600 leading-relaxed font-light">
-                  The House's eyewear collection continues to reinterpret emblematic motifs, from the GG, Web, bamboo, Horsebit and equestrian inspirations, in sumptuous materials, intricate craftsmanship, and fresh hues. These frames are presented in premium acetate and feature an engraved signature plaque.
-                </p>
+              <div className="border-b border-gray-200">
+                <button 
+                  onClick={() => toggleAccordion('description')}
+                  className="w-full py-6 flex justify-between items-center text-xs font-bold tracking-[0.2em] uppercase"
+                >
+                  Product Description
+                  {activeAccordion === 'description' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                <AnimatePresence>
+                  {activeAccordion === 'description' && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pb-6">
+                        <p className="text-xs text-gray-400 mb-4">Style 859558 J0740 1012</p>
+                        <p className="text-sm text-gray-600 leading-relaxed font-light">
+                          The House's eyewear collection continues to reinterpret emblematic motifs, from the GG, Web, bamboo, Horsebit and equestrian inspirations, in sumptuous materials, intricate craftsmanship, and fresh hues. These frames are presented in premium acetate and feature an engraved signature plaque.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Product Details */}

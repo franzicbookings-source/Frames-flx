@@ -94,13 +94,13 @@ export default function Header() {
 
         {/* Right Icons (Wishlist & Cart) */}
         <div className="flex items-center space-x-1 sm:space-x-2 w-1/3 justify-end">
-          <button 
+          <Link 
+            to="/auth"
             className="hidden sm:block p-2 hover:bg-gray-50 rounded-full transition-colors" 
             aria-label="Account"
-            onClick={() => alert('Account feature coming soon!')}
           >
             <User className="w-5 h-5" />
-          </button>
+          </Link>
           <Link to="/wishlist" className="p-2 hover:bg-gray-50 rounded-full transition-colors relative" aria-label="Wishlist">
             <Heart className="w-5 h-5" />
             {wishlist.length > 0 && (
@@ -179,18 +179,16 @@ export default function Header() {
                 transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="px-6 mt-4 flex flex-col space-y-2"
               >
-                 <button 
-                   onClick={() => {
-                     setIsMenuOpen(false);
-                     alert('Account feature coming soon!');
-                   }}
+                 <Link 
+                   to="/auth"
+                   onClick={() => setIsMenuOpen(false)}
                    className="w-full text-left text-sm font-bold tracking-[0.2em] uppercase border-b border-gray-200 py-6 flex justify-between items-center hover:text-gray-500 transition-colors group"
                  >
                    Account
                    <div className="p-2 bg-gray-50 rounded-full group-hover:bg-gray-100 transition-colors">
                      <User className="w-5 h-5 text-black" />
                    </div>
-                 </button>
+                 </Link>
                  <button 
                    onClick={() => {
                      setIsMenuOpen(false);

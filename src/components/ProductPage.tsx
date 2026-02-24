@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Truck, Phone, ShoppingBag, Heart } from 'lucide-react';
+import { ChevronDown, ChevronUp, Truck, Phone, ShoppingBag, Heart, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Product } from '../types';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+
+interface Review {
+  id: number;
+  name: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
 
 export default function ProductPage() {
   const location = useLocation();
@@ -20,6 +28,14 @@ export default function ProductPage() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [wishlistFeedback, setWishlistFeedback] = useState<{ show: boolean, message: string }>({ show: false, message: '' });
 
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([
+    { id: 1, name: 'Sarah M.', rating: 5, comment: 'Absolutely love these frames! The quality is outstanding and they fit perfectly.', date: '2026-01-15' },
+    { id: 2, name: 'Anonymous', rating: 4, comment: 'Great sunglasses, very stylish. Shipping took a bit longer than expected.', date: '2026-02-02' }
+  ]);
+  const [newReview, setNewReview] = useState({ name: '', rating: 5, comment: '' });
+  const [hoveredRating, setHoveredRating] = useState(0);
+
   const isProductInWishlist = product ? isInWishlist(product.id) : false;
 
   const handleWishlistToggle = () => {
@@ -31,6 +47,22 @@ export default function ProductPage() {
       setWishlistFeedback({ show: true, message: 'Added to Wishlist' });
     }
     setTimeout(() => setWishlistFeedback({ show: false, message: '' }), 3000);
+  };
+
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReview.comment.trim()) return;
+    
+    const review: Review = {
+      id: Date.now(),
+      name: newReview.name.trim() || 'Anonymous',
+      rating: newReview.rating,
+      comment: newReview.comment,
+      date: new Date().toISOString().split('T')[0]
+    };
+    
+    setReviews([review, ...reviews]);
+    setNewReview({ name: '', rating: 5, comment: '' });
   };
 
   useEffect(() => {
@@ -187,7 +219,7 @@ export default function ProductPage() {
             </div>
 
             {/* Accordions */}
-            <div className="border-t border-gray-200">
+            <div className="border-t border-gray-200 mb-12">
               {/* Product Description */}
               <div className="border-b border-gray-200">
                 <button 
@@ -296,6 +328,98 @@ export default function ProductPage() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Customer Reviews */}
+            <div className="mt-8">
+              <h2 className="text-xl font-serif tracking-widest uppercase text-black mb-8 border-b border-gray-200 pb-4">Customer Reviews</h2>
+              
+              {/* Review Form */}
+              <div className="bg-[#f5f5f4] p-6 mb-10">
+                <h3 className="text-xs font-bold tracking-[0.2em] uppercase mb-6">Write a Review</h3>
+                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-2">Rating</label>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setNewReview({ ...newReview, rating: star })}
+                          onMouseEnter={() => setHoveredRating(star)}
+                          onMouseLeave={() => setHoveredRating(0)}
+                          className="focus:outline-none"
+                        >
+                          <Star 
+                            className={`w-5 h-5 transition-colors ${
+                              star <= (hoveredRating || newReview.rating) 
+                                ? 'fill-black text-black' 
+                                : 'text-gray-300'
+                            }`} 
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="reviewerName" className="block text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-2">Name (Optional)</label>
+                    <input
+                      type="text"
+                      id="reviewerName"
+                      value={newReview.name}
+                      onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
+                      className="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black bg-white"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="reviewComment" className="block text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 mb-2">Review</label>
+                    <textarea
+                      id="reviewComment"
+                      value={newReview.comment}
+                      onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                      required
+                      rows={4}
+                      className="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black bg-white resize-none"
+                      placeholder="Share your thoughts about this product..."
+                    />
+                  </div>
+                  
+                  <button 
+                    type="submit"
+                    className="bg-black text-white px-8 py-3 text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-gray-800 transition-colors"
+                  >
+                    Submit Review
+                  </button>
+                </form>
+              </div>
+
+              {/* Reviews List */}
+              <div className="space-y-8">
+                {reviews.length === 0 ? (
+                  <p className="text-sm text-gray-500 font-light">No reviews yet. Be the first to review this product!</p>
+                ) : (
+                  reviews.map((review) => (
+                    <div key={review.id} className="border-b border-gray-100 pb-6 last:border-0">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star} 
+                              className={`w-3 h-3 ${star <= review.rating ? 'fill-black text-black' : 'text-gray-300'}`} 
+                            />
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-gray-400">{review.date}</span>
+                      </div>
+                      <h4 className="text-xs font-bold tracking-widest uppercase mb-2">{review.name}</h4>
+                      <p className="text-sm text-gray-600 font-light leading-relaxed">{review.comment}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

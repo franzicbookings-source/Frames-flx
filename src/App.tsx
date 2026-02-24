@@ -10,6 +10,10 @@ import Footer from './components/Footer';
 import Cart from './components/Cart';
 import ProductPage from './components/ProductPage';
 import Wishlist from './components/Wishlist';
+import Auth from './components/Auth';
+import ShippingReturns from './components/ShippingReturns';
+import FAQ from './components/FAQ';
+import CareGuide from './components/CareGuide';
 import { WishlistProvider } from './context/WishlistContext';
 import { CartProvider } from './context/CartContext';
 
@@ -40,6 +44,10 @@ export default function App() {
               <Route path="/product/:id" element={<ProductPage />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/shipping-returns" element={<ShippingReturns />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/care-guide" element={<CareGuide />} />
             </Routes>
             <Footer />
           </div>

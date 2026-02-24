@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Footer() {
   return (
     <footer className="bg-white pt-24 pb-12 px-4 md:px-8 overflow-hidden">
@@ -34,9 +36,9 @@ export default function Footer() {
               <ul className="space-y-5 text-[13px] text-black font-medium tracking-widest">
                 <li><a href="mailto:hello@flexframes.co.za" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>hello@flexframes.co.za</a></li>
                 <li><a href="https://wa.me/27739844001" target="_blank" rel="noopener noreferrer" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>073 984 4001</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); alert('Shipping & Returns policy coming soon!'); }} className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Shipping & Returns</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); alert('FAQ coming soon!'); }} className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>FAQ</a></li>
-                <li><a href="#" onClick={(e) => { e.preventDefault(); alert('Care Guide coming soon!'); }} className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Care Guide</a></li>
+                <li><Link to="/shipping-returns" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Shipping & Returns</Link></li>
+                <li><Link to="/faq" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>FAQ</Link></li>
+                <li><Link to="/care-guide" className="hover:text-gray-400 transition-colors relative group w-fit block"><span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-black transition-all group-hover:w-full"></span>Care Guide</Link></li>
               </ul>
             </div>
             <div className="flex flex-col">
